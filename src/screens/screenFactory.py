@@ -1,5 +1,6 @@
 import pygame
 from screens.menus.mainMenu import MainMenu
+from screens.game.mainGame import MainGame
 from screens.screen import Screen
 
 # a singleton factory that stores all screens to promote reuse of screen
@@ -9,14 +10,25 @@ class Screen_Factory:
     instance = None
 
     def __init__(self):
+        # window
+        height = 600
+        width = 800
+        self.window = pygame.display.set_mode((width, height))
+
         # screen type: screen instance
         self.screens: dict[str, Screen] = {}
 
-    def start_menu_screen(self) -> Screen:
-        if "mainMenu" not in self.screens:
-            self.screens["mainMenu"] = MainMenu(600, 800) 
+    def main_menu_screen(self) -> Screen:
+        if "MainMenu" not in self.screens:
+            self.screens["mainMenu"] = MainMenu(self.window) 
 
         return self.screens["mainMenu"]
+
+    def main_game_screen(self) -> Screen:
+        if "MainGame" not in self.screens:
+            self.screens["MainGame"] = MainGame(self.window) 
+
+        return self.screens["MainGame"]
 
     @staticmethod
     def get_instance():

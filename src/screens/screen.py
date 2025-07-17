@@ -1,20 +1,13 @@
-import pygame
-
 class Screen:
-    def __init__(self, 
-                 width, height): 
-        # screen size
-        self.width = width
-        self.height = height
-
+    def __init__(self, window): 
         # parent screen
         self.parent = None
 
         # framerate
         self.framerate = 60
 
-        # include screen (background)
-        self.screen = pygame.display.set_mode((self.width, self.height))
+        # base screen
+        self.window = window
     
     def set_parent(self, parent):
         self.parent = parent

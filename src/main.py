@@ -11,7 +11,7 @@ import sys
 
 pygame.init()
 
-screen: Screen | None = Screen_Factory.get_instance().start_menu_screen()
+screen: Screen | None = Screen_Factory.get_instance().main_menu_screen()
 
 # delta time
 clock = pygame.time.Clock()
