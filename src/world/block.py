@@ -3,21 +3,24 @@ Most basic unit in world
 """
 
 from typing import override
+import pygame
 
 
 class Block():
-    _size = 32
+    _size = 16
 
     def __init__(self, pos: tuple[float, float]) -> None:
         # block position
         self.x = pos[0]
         self.y = pos[1]
 
-        # neibouring blocks
-        self.up = None
-        self.down = None
-        self.left = None
-        self.right = None
+        # neibouring blocks 
+        self.neibouring_blocks: dict[str, Block | None] = {
+            "up": None,
+            "down": None,
+            "left": None,
+            "right": None
+        }
 
         # properies of the block
         self.properties: list[Property] = []
@@ -28,7 +31,15 @@ class Block():
 
         # free flight properties
         self.velocity: tuple[float, float] = (0, 0)
+
+        # must exceed size in either dimesion to move
+        self.speed: tuple[float, float] = (0, 0)
         self.free = False
+
+    def __eq__(self, other):
+        if not isinstance(other, Block):
+            return NotImplemented
+        return self.x == other.x and self.y == other.y
 
     def set_color(self, color):
         self.color = color
@@ -40,14 +51,84 @@ class Block():
     def leave_free_flight(self, pos: tuple[float, float]):
         self.velocity = (0, 0)
         self.free = False
-        self.pos = pos
 
-    def set_neibours(self, up, down, left, right):
-        self.up = up
-        self.down = down
-        self.left = left
-        self.right = right
+    def swap_blocks(self, block):
+        """
+        Swaps two blocks positions
+        """
+        temp = self.x
+        self.x = block.x
+        block.x = temp
+        
+        temp = self.y
+        self.y = block.y
+        block.y = temp
 
+        # re assign neibouring blocks
+        temp_neibours = {
+            "up": self.neibouring_blocks["up"],
+            "down": self.neibouring_blocks["down"],
+            "left": self.neibouring_blocks["left"],
+            "right": self.neibouring_blocks["right"]
+        }
+
+        # assign new self neibours
+        for neibour in block.neibouring_blocks:
+            if block.neibouring_blocks[neibour] == self:
+                self.neibouring_blocks[neibour] = block
+                continue
+            self.neibouring_blocks[neibour] = block.neibouring_blocks[neibour]
+
+        # assign new block neibours
+        for neibour in temp_neibours:
+            if temp_neibours[neibour] == block:
+                block.neibouring_blocks[neibour] = self
+                continue
+            block.neibouring_blocks[neibour] = temp_neibours[neibour]
+
+        # re evaluate neibours beleif in their neibour
+        if self.neibouring_blocks["up"] is not None: 
+            self.neibouring_blocks["up"].neibouring_blocks["down"] = self
+        if self.neibouring_blocks["down"] is not None: 
+            self.neibouring_blocks["down"].neibouring_blocks["up"] = self
+        if self.neibouring_blocks["left"] is not None: 
+            self.neibouring_blocks["left"].neibouring_blocks["right"] = self
+        if self.neibouring_blocks["right"] is not None: 
+            self.neibouring_blocks["right"].neibouring_blocks["left"] = self
+
+        if block.neibouring_blocks["up"] is not None:
+            block.neibouring_blocks["up"].neibouring_blocks["down"] = block
+        if block.neibouring_blocks["down"] is not None:
+            block.neibouring_blocks["down"].neibouring_blocks["up"] = block
+        if block.neibouring_blocks["left"] is not None:
+            block.neibouring_blocks["left"].neibouring_blocks["right"] = block
+        if block.neibouring_blocks["right"] is not None:
+            block.neibouring_blocks["right"].neibouring_blocks["left"] = block
+       
+    def move(self):
+        """
+        Updates the blocks speed and if nessicary moves and
+        swaps the blocks positions
+        """
+
+        # increase speed
+        self.speed = (self.speed[0] + self.velocity[0], 
+                      self.speed[1] + self.velocity[1])
+
+        if self.speed[0] >= Block._size:
+            self.speed = (self.speed[0] - Block._size, self.speed[1])
+            self.swap_blocks(self.neibouring_blocks["right"])
+        elif self.speed[0] <= -Block._size:
+            self.speed = (self.speed[0] + Block._size, self.speed[1])
+            self.swap_blocks(self.neibouring_blocks["left"])
+
+        if self.speed[1] >= Block._size:
+            self.speed = (self.speed[0], self.speed[1] - Block._size)
+            self.swap_blocks(self.neibouring_blocks["down"])
+        elif self.speed[1] <= -Block._size:
+            self.speed = (self.speed[0], self.speed[1] + Block._size)
+            self.swap_blocks(self.neibouring_blocks["up"])
+        
     def get_index(self):
         return (int(self.x / Block._size), int(self.y / Block._size))
 
@@ -58,22 +139,22 @@ class Block():
         return False
     
     def draw(self, surface):
-        pass
+        # draw block
+        pygame.draw.rect(surface, self.color, 
+                         (self.x, self.y, Block._size, Block._size)) 
 
     def update(self):
         # update all properties
         for property in self.properties:
             property.update(self)
 
-        # fly
+        # update any movement
         if self.free:
-            self.x += self.velocity[0]
-            self.y += self.velocity[1]
+            self.move()
 
 """
 A property of a block
 """
-
 class Property:
     def __init__(self) -> None:
         # spread value (how many turns to spread) (-1 = no spread)
@@ -95,13 +176,13 @@ class SolidProperty(Property):
 class GravityProperty(Property):
     def __init__(self) -> None:
         super().__init__()
-        self.gravity: int = 1
+        self.gravity: int = 3
 
     @override     
     def update(self, block: Block):
         super().update(block)
         # check if a solid block exists below
-        if not block.down or not block.down.check_property(SolidProperty):
+        if block.neibouring_blocks["down"] is None or block.neibouring_blocks["down"].check_property(SolidProperty) is False:
             block.enter_free_flight((0, self.gravity))
 
 class FireProperty(Property):

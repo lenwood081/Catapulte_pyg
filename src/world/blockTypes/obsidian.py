@@ -1,0 +1,14 @@
+"""
+Block that isnt affected by gravity, fire or any thing like that
+it is solid
+it cannot be moved
+"""
+
+from world.block import Block, Property, SolidProperty
+
+class ObsidianBlock(Block):
+    def __init__(self, pos):
+        super().__init__(pos)
+        self.set_color((0, 0, 0))
+        self.properties.append(SolidProperty())
+
