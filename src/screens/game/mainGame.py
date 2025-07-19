@@ -2,21 +2,24 @@
 from typing import override
 from screens.screen import Screen
 from pygame.locals import K_ESCAPE
-from world.world import World
+from world.worldTypes.testWorld import TestWorld
+from camera.camera import Camera
 
 class MainGame(Screen):
     def __init__(self, window):
         super().__init__(window)
 
-        self.world = World((10, 10))
+        self.world = TestWorld((400, 400))
+        self.camera = Camera(400, 400)
 
     @override
     def draw(self):
         # create background
         self.window.fill((255, 255, 0)) 
-
+        
         # draw world
-        self.world.draw(self.window)
+        self.world.draw(self.camera)
+        self.camera.draw(self.window)
 
     @override 
     def run(self, dt: float, events):

@@ -11,4 +11,5 @@ class ObsidianBlock(Block):
         super().__init__(pos)
         self.set_color((0, 0, 0))
         self.properties.append(SolidProperty())
+        self.set_to_draw(True)
 

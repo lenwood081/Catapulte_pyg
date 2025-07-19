@@ -36,6 +36,9 @@ class Block():
         self.speed: tuple[float, float] = (0, 0)
         self.free = False
 
+        # determines whether or not to draw
+        self.to_draw = False
+
     def __eq__(self, other):
         if not isinstance(other, Block):
             return NotImplemented
@@ -137,8 +140,13 @@ class Block():
             if isinstance(p, property):
                 return True
         return False
+
+    def set_to_draw(self, to_draw: bool):
+        self.to_draw = to_draw
     
-    def draw(self, surface):
+    def draw(self, surface: pygame.surface.Surface):
+        if not self.to_draw:
+            return
         # draw block
         pygame.draw.rect(surface, self.color, 
                          (self.x, self.y, Block._size, Block._size)) 
