@@ -3,7 +3,6 @@ A simple obsidian surrounded world for testing
 during development
 """
 
-import pygame
 from world.world import World
 
 class TestWorld(World):

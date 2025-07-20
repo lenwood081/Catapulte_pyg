@@ -21,7 +21,7 @@ class Camera:
         pass
 
     def draw(self, surface):
-        surface.blit(self.surface, (100, 100)) 
+        surface.blit(self.surface, (0, 0)) 
 
     def draw_surface(self, surface: pygame.surface.Surface) -> None:
         self.surface.blit(surface, (self.x, self.y))

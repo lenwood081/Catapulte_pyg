@@ -21,6 +21,7 @@ class Block():
             "left": None,
             "right": None
         }
+        self.holder: BlockHolder
 
         # properies of the block
         self.properties: list[Property] = []
@@ -46,6 +47,9 @@ class Block():
 
     def set_color(self, color):
         self.color = color
+
+    def set_holder(self, holder):
+        self.holder = holder
 
     def enter_free_flight(self, velocity: tuple[float, float]): 
         self.velocity = velocity
@@ -74,6 +78,11 @@ class Block():
             "left": self.neibouring_blocks["left"],
             "right": self.neibouring_blocks["right"]
         }
+
+        # reassign holders
+        temp_holder = self.holder
+        self.holder.set_block(block)
+        block.holder.set_block(self)
 
         # assign new self neibours
         for neibour in block.neibouring_blocks:
@@ -159,6 +168,27 @@ class Block():
         # update any movement
         if self.free:
             self.move()
+
+"""
+A abstract position that hold one block
+"""
+class BlockHolder():
+    def __init__(self) -> None:
+        self.block: Block | None = None
+
+    def set_block(self, block: Block):
+        self.block = block
+        self.block.set_holder(self) 
+
+    def draw(self, surface: pygame.surface.Surface):
+        if self.block is None:
+            return
+        self.block.draw(surface)
+
+    def update(self):
+        if self.block is None:
+            return
+        self.block.update()
 
 """
 A property of a block
