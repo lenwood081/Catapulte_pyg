@@ -4,7 +4,7 @@ it is solid
 it cannot be moved
 """
 
-from world.block import Block, Property, SolidProperty
+from world.block import Block, SolidProperty
 
 class ObsidianBlock(Block):
     def __init__(self, pos):

@@ -14,6 +14,13 @@ class MainGame(Screen):
         self.camera = DevCamera(800, 600)
 
     @override
+    def update(self) -> None:
+        super().update()
+
+        # update world
+        self.world.update()
+
+    @override
     def draw(self):
         # create background
         self.window.fill((255, 255, 0)) 
@@ -32,6 +39,7 @@ class MainGame(Screen):
         # inform observers
         ObserverFactory.get_instance().get_arrorK().notify(events[1])
         
+        self.update()
         self.draw()
         return self
 

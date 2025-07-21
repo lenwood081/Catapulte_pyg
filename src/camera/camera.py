@@ -17,9 +17,6 @@ class Camera:
         self.x = 0
         self.y = 0
 
-    def update(self):
-        pass
-
     def draw(self, surface):
         surface.blit(self.surface, (0, 0)) 
 
