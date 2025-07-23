@@ -10,13 +10,5 @@ class VoidBlock(Block):
         super().__init__(pos)
         self.properties.append(GasProperty())
         self.properties[0].set_spread(-1)
+        self.set_to_draw(False)
 
-
-    @override
-    def update(self):
-        pass
-
-    @override
-    def draw(self, surface):
-        # clear
-        pass

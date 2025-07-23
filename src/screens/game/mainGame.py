@@ -10,7 +10,7 @@ class MainGame(Screen):
     def __init__(self, window):
         super().__init__(window)
 
-        self.world = TestWorld((800, 800))
+        self.world = TestWorld((800, 600))
         self.camera = DevCamera(800, 600)
 
     @override

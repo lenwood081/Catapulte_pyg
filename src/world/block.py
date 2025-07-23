@@ -7,7 +7,7 @@ import pygame
 
 
 class Block():
-    _size = 16
+    _size = 6
     _block_count = 0
 
     def __init__(self, pos: tuple[float, float]) -> None:
@@ -30,10 +30,9 @@ class Block():
 
         # must exceed size in either dimesion to move
         self.speed: tuple[float, float] = (0, 0)
-        self.free = False
 
         # determines whether or not to draw
-        self.to_draw = False
+        self.to_draw = True
 
     def __eq__(self, other):
         if not isinstance(other, Block):
@@ -43,8 +42,10 @@ class Block():
     def simple_varience(self, low: int, high: int) -> int:
         difference = (high - low)
         value = low + self.__class__._block_count % difference
-        print(value)
         return value
+
+    def place_random_block_gravity(self) -> None:
+
 
     def color_vary(self, var_r: int, var_g: int, var_b: int) -> None:
         self.base_color = (self.simple_varience(self.base_color[0] - var_r, self.base_color[0] + var_r),
@@ -73,13 +74,27 @@ class Block():
     def set_holder(self, holder):
         self.holder = holder
 
-    def enter_free_flight(self, velocity: tuple[float, float]): 
-        self.velocity = velocity
-        self.free = True
+    def add_velocity(self, velocity: tuple[float, float], max: tuple[float, float] = (0,0)):
+        x = self.velocity[0] + velocity[0]
+        y = self.velocity[1] + velocity[1]
 
-    def leave_free_flight(self, pos: tuple[float, float]):
-        self.velocity = (0, 0)
-        self.free = False
+        if max[0] != 0:
+            x = max[0] if x > max[0] else x
+            x = -max[0] if x < -max[0] else x
+
+        if max[1] != 0:
+            y = max[1] if y > max[1] else y
+            y = -max[1] if y < -max[1] else y
+        
+        self.velocity = (x, y)
+
+    def kill_x_velocity(self):
+        self.velocity = (0, self.velocity[1])
+        self.speed = (0, self.speed[1])
+
+    def kill_y_velocity(self):
+        self.velocity = (self.velocity[0], 0)
+        self.speed = (self.speed[0], 0)
 
     def dupulicate(self, block):
         dupulicate = self.__class__((block.x, block.y))
@@ -101,12 +116,9 @@ class Block():
         block.y = temp
 
         # reassign holders
-        self.holder.set_block(block)
-        block.holder.set_block(self)
-
         temp_holder = self.holder
-        self.holder = block.holder
-        block.holder = temp_holder
+        block.holder.set_block(self)
+        temp_holder.set_block(block)
        
     def move(self):
         """
@@ -157,8 +169,7 @@ class Block():
             property.update(self)
 
         # update any movement
-        if self.free:
-            self.move()
+        self.move()
 
 """
 A abstract position that hold one block
@@ -247,16 +258,19 @@ class SolidProperty(Property):
         super().__init__()
 
 class GravityProperty(Property):
-    def __init__(self) -> None:
+    def __init__(self, terminal_velocity: float = 16) -> None:
         super().__init__()
-        self.gravity: int = 3
-
+        self.gravity: float = 1/6
+        self.terminal_velocity: float = terminal_velocity
+        
     @override     
     def update(self, block: Block):
         super().update(block)
         # check if a solid block exists below
-        if block.neibouring_blocks["down"] is None or block.neibouring_blocks["down"].check_property(SolidProperty) is False:
-            block.enter_free_flight((0, self.gravity))
+        if block.holder.get_neibouring_block("down") is None or block.holder.get_neibouring_block("down").check_property(SolidProperty) is False:
+            block.add_velocity((0, self.gravity), max=(0, self.terminal_velocity))
+        else:
+            block.kill_y_velocity()
 
 class FireProperty(Property):
     def __init__(self) -> None:

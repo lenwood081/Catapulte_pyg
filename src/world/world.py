@@ -8,6 +8,7 @@ from camera.camera import Camera
 from world.block import Block, BlockHolder
 from world.blockTypes.obsidian import ObsidianBlock
 from world.blockTypes.void import VoidBlock 
+from world.blockTypes.air import AirBlock
 
 class World():
     def __init__(self, size: tuple[int, int]) -> None:
@@ -19,7 +20,7 @@ class World():
         self.y = self.y_p//Block._size
 
         # create empty world
-        self.world = [[BlockHolder() for i in range(self.x)] for j in range(self.y)]
+        self.world = [[BlockHolder() for i in range(self.y)] for j in range(self.x)]
         self.set_neibours()
 
         self.surface = pygame.surface.Surface((self.x_p, self.y_p))
@@ -62,6 +63,15 @@ class World():
         for i in range(self.x):
             for j in range(self.y):
                 self.world[i][j].set_block(VoidBlock((i*Block._size, 
+                                                    j*Block._size)))
+
+    def air_fill(self):
+        """
+        Fill all blockholders with air block
+        """
+        for i in range(self.x):
+            for j in range(self.y):
+                self.world[i][j].set_block(AirBlock((i*Block._size, 
                                                     j*Block._size)))
 
     def obsidian_border(self):
