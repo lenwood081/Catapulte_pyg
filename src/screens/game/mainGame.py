@@ -14,11 +14,11 @@ class MainGame(Screen):
         self.camera = DevCamera(800, 600)
 
     @override
-    def update(self) -> None:
-        super().update()
+    def update(self, dt: float) -> None:
+        super().update(dt)
 
         # update world
-        self.world.update()
+        self.world.update(dt)
 
     @override
     def draw(self):
@@ -39,7 +39,7 @@ class MainGame(Screen):
         # inform observers
         ObserverFactory.get_instance().get_arrorK().notify(events[1])
         
-        self.update()
+        self.update(dt)
         self.draw()
         return self
 

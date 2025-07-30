@@ -19,7 +19,7 @@ class Screen:
         # draw all game obejects
         pass
 
-    def update(self) -> None:
+    def update(self, dt: float) -> None:
         # update all game objects
         pass    
 

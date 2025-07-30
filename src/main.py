@@ -23,6 +23,7 @@ while running:
     dt = time.time() - last_time
     dt *= FRAMERATE
     last_time = time.time()
+    print(dt)
 
     # get inputs
     events = pygame.event.get()

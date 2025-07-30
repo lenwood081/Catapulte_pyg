@@ -7,7 +7,7 @@ import pygame
 
 
 class Block():
-    _size = 6
+    _size = 20
     _block_count = 0
 
     def __init__(self, pos: tuple[float, float]) -> None:
@@ -34,18 +34,22 @@ class Block():
         # determines whether or not to draw
         self.to_draw = True
 
+        # important state check (True if updated in last loop, False if not)
+        self.update_state = False
+        self.scheduled_to_update = True
+
     def __eq__(self, other):
         if not isinstance(other, Block):
             return NotImplemented
         return self.x == other.x and self.y == other.y
 
+    def get_if_updated(self) -> bool:
+        return self.update_state
+
     def simple_varience(self, low: int, high: int) -> int:
         difference = (high - low)
         value = low + self.__class__._block_count % difference
         return value
-
-    def place_random_block_gravity(self) -> None:
-
 
     def color_vary(self, var_r: int, var_g: int, var_b: int) -> None:
         self.base_color = (self.simple_varience(self.base_color[0] - var_r, self.base_color[0] + var_r),
@@ -107,6 +111,10 @@ class Block():
         """
         Swaps two blocks positions
         """
+         
+        self.update_state = True
+        block.update_state = True
+
         temp = self.x
         self.x = block.x
         block.x = temp
@@ -120,11 +128,14 @@ class Block():
         block.holder.set_block(self)
         temp_holder.set_block(block)
        
-    def move(self):
+    def move(self, dt: float):
         """
         Updates the blocks speed and if nessicary moves and
         swaps the blocks positions
         """
+
+        if self.velocity[0] == 0 and self.velocity[1] == 0:
+            return
 
         # increase speed
         self.speed = (self.speed[0] + self.velocity[0], 
@@ -163,13 +174,24 @@ class Block():
         pygame.draw.rect(surface, self.color, 
                          (self.x, self.y, Block._size, Block._size)) 
 
-    def update(self):
+    def update(self, dt: float):
+        self.update_state = False
+        if not self.scheduled_to_update:
+            self.color = self.base_color
+            return
+
+        self.color = (250, 0, 0) # DEBUGGING
+        self.scheduled_to_update = False
+
         # update all properties
         for property in self.properties:
-            property.update(self)
+            self.update_state = (property.update(self) or self.update_state)
 
         # update any movement
-        self.move()
+        self.move(dt)
+
+        if self.update_state:
+            self.scheduled_to_update = True
 
 """
 A abstract position that hold one block
@@ -191,24 +213,32 @@ class BlockHolder():
             return None 
 
         # shouldent be a error
-        return self.neibours[neibour].get_block()
+        return self.neibours[neibour].block
 
     def set_block(self, block: Block):
         self.block = block
         self.block.set_holder(self)
-
-    def get_block(self):
-        return self.block
 
     def draw(self, surface: pygame.surface.Surface):
         if self.block is None:
             return
         self.block.draw(surface)
 
-    def update(self):
+    def determine_updates(self):
         if self.block is None:
             return
-        self.block.update()
+
+        if self.block.get_if_updated():
+            # update all neibours
+            for neibour in self.neibours.values():
+                if neibour is not None:
+                    if neibour.block is not None:
+                        neibour.block.scheduled_to_update = True
+
+    def update(self, dt: float):
+        if self.block is None:
+            return
+        self.block.update(dt)
 
 """
 A property of a block
@@ -225,15 +255,23 @@ class Property:
     def on_spread(self, block: Block) -> bool:
         return False
     
-    def update(self, block: Block):
+    def update(self, block: Block) -> bool:
+        """
+        return True if there was change
+        """
+
         # check if spreading
         if self.spread_count == self.spread:
             # reset spread count
             if self.on_spread(block):
                 self.spread_count = 0
+                return True
         # increment spread count
         elif (self.spread_count < self.spread):
             self.spread_count += 1
+            return True
+
+        return False
 
 
 class GasProperty(Property):
@@ -244,12 +282,12 @@ class GasProperty(Property):
     @override
     def on_spread(self, block: Block) -> bool:
         for holder in block.holder.neibours.values():
-            if holder is not None and holder.get_block() is not None:
-                if holder.get_block().check_property(GasProperty) is True:
+            if holder is not None and holder.block is not None:
+                if holder.block.check_property(GasProperty) is True:
                     # check not the same block type
-                    if type(holder.get_block()) == type(block):
+                    if type(holder.block) == type(block):
                         continue
-                    block.dupulicate(holder.get_block())
+                    block.dupulicate(holder.block)
                     return True
         return False
 
@@ -257,26 +295,29 @@ class SolidProperty(Property):
     def __init__(self) -> None:
         super().__init__()
 
-class GravityProperty(Property):
-    def __init__(self, terminal_velocity: float = 16) -> None:
+class BreakProperty(Property):
+    def __init__(self) -> None:
         super().__init__()
-        self.gravity: float = 1/6
+
+class GravityProperty(Property):
+    def __init__(self, terminal_velocity: float = 4) -> None:
+        super().__init__()
+        self.gravity: float = 1/16
         self.terminal_velocity: float = terminal_velocity
         
     @override     
-    def update(self, block: Block):
-        super().update(block)
+    def update(self, block: Block) -> bool:
         # check if a solid block exists below
         if block.holder.get_neibouring_block("down") is None or block.holder.get_neibouring_block("down").check_property(SolidProperty) is False:
             block.add_velocity((0, self.gravity), max=(0, self.terminal_velocity))
+            return True
         else:
+            if block.velocity[1] == 0:
+                return False
             block.kill_y_velocity()
+        return True
 
 class FireProperty(Property):
     def __init__(self) -> None:
         super().__init__()
-
-    @override
-    def update(self, block: Block):
-        super().update(block)
         

@@ -97,8 +97,13 @@ class World():
         # draw to camera
         camera.draw_surface(self.surface)
 
-    def update(self):
+    def update(self, dt: float):
+        # determine which blocks need updateing
         for row in self.world:
             for block in row:
-                block.update()
+                block.determine_updates()
+
+        for row in self.world:
+            for block in row:
+                block.update(dt)
 
