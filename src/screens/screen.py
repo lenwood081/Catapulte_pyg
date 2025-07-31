@@ -24,6 +24,7 @@ class Screen:
         pass    
 
     # run the screen loop
+    # events = (events, keys_pressed, mouse_pressed, (mouse_x, mouse_y))
     def run(self, dt: float, events): 
         return self
 

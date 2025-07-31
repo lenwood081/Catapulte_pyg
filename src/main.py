@@ -29,6 +29,7 @@ while running:
     events = pygame.event.get()
     keys_pressed = pygame.key.get_pressed()
     mouse_pressed = pygame.mouse.get_pressed()
+    mouse_x, mouse_y = pygame.mouse.get_pos()
 
     # handle forced exit event
     for event in events:
@@ -38,7 +39,7 @@ while running:
             sys.exit()
 
     # get events and pass to screen
-    screen = screen.run(dt, (events, keys_pressed, mouse_pressed))
+    screen = screen.run(dt, (events, keys_pressed, mouse_pressed, (mouse_x, mouse_y)))
 
     # check if screen exists
     if screen is None:
