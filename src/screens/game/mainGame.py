@@ -38,6 +38,7 @@ class MainGame(Screen):
 
         # inform observers
         ObserverFactory.get_instance().get_arrorK().notify(events[1])
+        ObserverFactory.get_instance().get_mouse_left_click_pos().notify((events[2], events[3]))
         
         self.update(dt)
         self.draw()

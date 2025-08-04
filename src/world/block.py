@@ -3,14 +3,18 @@ Most basic unit in world
 """
 
 from typing import override
+from observers.observer import Subscriber, ObserverFactory
 import pygame
 
 
-class Block():
-    _size = 20
+class Block(Subscriber):
+    _size = 8
     _block_count = 0
 
     def __init__(self, pos: tuple[float, float]) -> None:
+        super().__init__()
+    
+
         self.__class__._block_count += 1
         # block position
         self.x = pos[0]

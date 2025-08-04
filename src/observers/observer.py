@@ -41,7 +41,9 @@ class ObserverFactory:
         return self.observers["ArrowKObserver"]
 
     def get_mouse_left_click_pos(self):
-        pass
+        if "MouseLeftClickPosObserver" not in self.observers:
+            self.observers["MouseLeftClickPosObserver"] = MouseLeftClickPosObserver()
+        return self.observers["MouseLeftClickPosObserver"]
 
     @staticmethod
     def get_instance():
@@ -107,4 +109,8 @@ class MouseLeftClickPosObserver(Observer):
         # information = (mouse pressed, (mouse_x, mouse_y))
 
         # check if mouse left clicked
-        pass
+        if not information[0][0]:
+            return
+        
+        super().notify(information[1])
+
