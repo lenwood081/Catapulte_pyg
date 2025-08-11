@@ -13,14 +13,6 @@ class TCPClient:
         # connect to server
         client.connect((bind_ip, bind_port))
 
-        # ----- AI ------
-        message = "Hello from the client!"
-        client.sendall(message.encode('utf-8'))
-
-        data = client.recv(1024)  # Receive up to 1024 bytes
-        print(f"Received from server: {data.decode('utf-8')}")
-
-
     def get_new_frame(self):
         """
         gets the most recent update frames sent from the server
@@ -29,4 +21,5 @@ class TCPClient:
         """
         pass
         
-
+client1 = TCPClient()
+client1.connect()
