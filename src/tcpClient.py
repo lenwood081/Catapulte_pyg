@@ -2,16 +2,32 @@ import socket
 import threading
 import time
 
+from tcpMessageSymbols import *
+
 class TCPClient:
     def __init__(self):
-        pass
 
-    def connect(self, bind_ip='127.0.0.1', bind_port=9999):
+        self.frame_buffer = []
+
+    def connect(self, bind_ip='127.0.0.1', bind_port=9997):
         # create TCP socket
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         # connect to server
         client.connect((bind_ip, bind_port))
+
+        # revieve frames
+        message_buffer = ""
+        while True:
+            # use message buffer to piece together frames
+            # save frame and clear buffer, SOF, EOF
+            frame = client.recv(1024)
+            message_buffer += frame.decode()
+
+            frame_end = message_buffer.find(EOF)
+            if frame_end != -1:
+                self.frame_buffer.append(message_buffer[frame_end:])
+                message_buffer = message_buffer[:frame_end]
 
     def get_new_frame(self):
         """
@@ -19,7 +35,18 @@ class TCPClient:
         clears the update buffer, and returns these frames
         client should impliment the frames in the order recived 
         """
-        pass
-        
+        if not self.frame_buffer:
+            return
+
+        frame = self.frame_buffer[0] 
+        self.frame_buffer.pop(0)
+        return frame
+
 client1 = TCPClient()
-client1.connect()
+client1_connection = threading.Thread(target=client1.connect)
+client1_connection.start()
+
+while True:
+    frame = client1.get_new_frame()
+    if frame:
+        print(frame)
