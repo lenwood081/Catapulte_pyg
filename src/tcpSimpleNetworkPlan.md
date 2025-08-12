@@ -37,3 +37,34 @@ Has a actions it can preform, sends results to server
         for example highlighting where movement it possible, or
         building is possible
 
+## Example
+
+* Server starts
+
+* Both clients connect to 
+
+    - if either client disconnects, inform other client, and close all connections, stop game
+
+* Server sends initiation message to both clients
+
+    - SOM, SOF start screen, any other information needed to start the game, EOF
+
+* Both clients Recieves SOM and displays the start screen
+
+* Server sends updated pixels to both clients
+
+    - SOF, (rgb, (x, y)), EOF
+
+* Both clients recieve the updated pixels and make changes to their display
+
+--> TODO, actions from client
+
+* Server closes connections on game end
+
+    - SOF, EOF, EOM
+
+** Special case, if one client disconnects
+
+    - Server sends SOF, client disconnected, EOF, EOM
+
+

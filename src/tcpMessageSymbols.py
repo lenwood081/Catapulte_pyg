@@ -12,7 +12,3 @@ SOF = "&^&"
 # end of frame
 EOF = "&!&" 
 
-# frame number **101--
-NUM_STRT = "**"
-NUM_END = "--"
-
