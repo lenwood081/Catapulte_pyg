@@ -53,6 +53,8 @@ class TCPServer:
         # clear frame buffer
         # self.frames[client_number] = []
         while True:
+            time.sleep(0.01) # PERFORMANCE
+
             # send avalible frames until EOM recieved
             if self.frames[client_number]:
                 # complile frame
@@ -104,7 +106,8 @@ server_thread = threading.Thread(target=server.start)
 
 server_thread.start()
 
-time.sleep(5)
+while not server.clients_connected():
+    time.sleep(1)
 
 server.add_frame("hello")
 
