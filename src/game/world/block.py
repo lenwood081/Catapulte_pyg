@@ -4,7 +4,9 @@ Most basic unit in world
 
 from typing import override
 from observers.observer import Subscriber, ObserverFactory
+from game.server.updatePusher import UpdatePusher
 import pygame
+import json
 
 
 class Block(Subscriber):
@@ -13,9 +15,10 @@ class Block(Subscriber):
 
     def __init__(self, pos: tuple[float, float]) -> None:
         super().__init__()
-    
 
         self.__class__._block_count += 1
+        self.id = self.__class__._block_count
+
         # block position
         self.x = pos[0]
         self.y = pos[1]
@@ -96,6 +99,7 @@ class Block(Subscriber):
         
         self.velocity = (x, y)
 
+
     def kill_x_velocity(self):
         self.velocity = (0, self.velocity[1])
         self.speed = (0, self.speed[1])
@@ -111,6 +115,8 @@ class Block(Subscriber):
         dupulicate.holder = block.holder
         dupulicate.holder.set_block(dupulicate)
 
+        # TODO send dupulicate update to update pusher
+
     def swap_blocks(self, block):
         """
         Swaps two blocks positions
@@ -118,6 +124,8 @@ class Block(Subscriber):
          
         self.update_state = True
         block.update_state = True
+        
+        # TODO send swap update to update pusher
 
         temp = self.x
         self.x = block.x
@@ -175,6 +183,8 @@ class Block(Subscriber):
         if not self.to_draw:
             return
         # draw block
+
+        # TODO: transform to blit on surface call (avoids expensive draw calls)
         pygame.draw.rect(surface, self.color, 
                          (self.x, self.y, Block._size, Block._size)) 
 
@@ -195,7 +205,29 @@ class Block(Subscriber):
         self.move(dt)
 
         if self.update_state:
+            UpdatePusher.get_instance().add_update(self.summerise_block_state())
             self.scheduled_to_update = True
+
+    def summerise_block_state(self):
+        # TODO: Complile to json form for sending over network 
+
+        state = {
+            "p": (self.x, self.y),
+            "v": self.velocity,
+            "s": self.speed,
+            "id": self.id,
+            "c": self.color,
+            "bc": self.base_color,
+            # add all properties into a dictionary
+            "props": [ {
+                "s": property.spread,
+                "sc": property.spread_count,
+                "n": property.name,
+            } for property in self.properties]
+        }
+        
+        # convert to json string
+        return json.dumps(state)
 
 """
 A abstract position that hold one block
@@ -252,6 +284,7 @@ class Property:
         # spread value (how many turns to spread) (-1 = no spread)
         self.spread: int = -1
         self.spread_count: int = 0
+        self.name = "base"
 
     def set_spread(self, spread: int):
         self.spread = spread
@@ -282,6 +315,7 @@ class GasProperty(Property):
     def __init__(self) -> None:
         super().__init__()
         self.set_spread(30)
+        self.name = "gas"
 
     @override
     def on_spread(self, block: Block) -> bool:
@@ -298,16 +332,19 @@ class GasProperty(Property):
 class SolidProperty(Property):
     def __init__(self) -> None:
         super().__init__()
+        self.name = "solid"
 
 class BreakProperty(Property):
     def __init__(self) -> None:
         super().__init__()
+        self.name = "break"
 
 class GravityProperty(Property):
     def __init__(self, terminal_velocity: float = 4) -> None:
         super().__init__()
         self.gravity: float = 1/16
         self.terminal_velocity: float = terminal_velocity
+        self.name = "gravity"
         
     @override     
     def update(self, block: Block) -> bool:
@@ -324,4 +361,5 @@ class GravityProperty(Property):
 class FireProperty(Property):
     def __init__(self) -> None:
         super().__init__()
+        self.name = "fire"
         

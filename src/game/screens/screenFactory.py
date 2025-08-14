@@ -30,6 +30,12 @@ class Screen_Factory:
 
         return self.screens["MainGame"]
 
+    def server_game_screen(self) -> Screen:
+        if "ServerGame" not in self.screens:
+            self.screens["ServerGame"] = ServerGame(self.window) 
+
+        return self.screens["ServerGame"]
+
     @staticmethod
     def get_instance():
         if Screen_Factory.instance is None:
