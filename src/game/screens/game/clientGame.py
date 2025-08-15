@@ -1,29 +1,28 @@
-from screens.screen import Screen
-from server.updatePusher import UpdatePusher
+from tcpClient import TCPClient
 import threading
+from screens.screen import Screen
 from typing import override
 from camera.cameras.devCamera import DevCamera
-from world.worldTypes.testWorld import TestWorld
 from pygame.locals import K_ESCAPE
 from observers.observer import ObserverFactory
-from tcpServer import TCPServer
 
 """
-Server Game, authorative as to the game state
-recives infromation from clients
-tcp connections to clients
-sends updated blocks at each tick
+Client Game
+reflects the packets recived from the server
+predicts next updates
+compares differences and backtracks if nessicary
 """
 
-class ServerGame(Screen):
+class ClientGame(Screen):
     def __init__(self, window):
         super().__init__(window)
 
-        self.world = TestWorld((800, 600))
+        # special client world
+        self.world = None
         self.camera = DevCamera(800, 600)
 
-        self.server = TCPServer()
-        self.server_thread = threading.Thread(target=self.server.start)
+        self.client = TCPClient()
+        self.client_thread = threading.Thread(target=self.client.start)
         self.server_thread.start()
         UpdatePusher.get_instance().activate()
     
@@ -71,5 +70,4 @@ class ServerGame(Screen):
 
 
  
-
 

@@ -4,9 +4,8 @@ Most basic unit in world
 
 from typing import override
 from observers.observer import Subscriber, ObserverFactory
-from game.server.updatePusher import UpdatePusher
+from server.updatePusher import UpdatePusher
 import pygame
-import json
 
 
 class Block(Subscriber):
@@ -185,8 +184,11 @@ class Block(Subscriber):
         # draw block
 
         # TODO: transform to blit on surface call (avoids expensive draw calls)
+
         pygame.draw.rect(surface, self.color, 
-                         (self.x, self.y, Block._size, Block._size)) 
+                        (self.x, self.y, Block._size, Block._size)) 
+
+
 
     def update(self, dt: float):
         self.update_state = False
@@ -194,7 +196,7 @@ class Block(Subscriber):
             self.color = self.base_color
             return
 
-        self.color = (250, 0, 0) # DEBUGGING
+        self.color = (100, 0, 0) # DEBUGGING
         self.scheduled_to_update = False
 
         # update all properties
@@ -226,8 +228,7 @@ class Block(Subscriber):
             } for property in self.properties]
         }
         
-        # convert to json string
-        return json.dumps(state)
+        return state
 
 """
 A abstract position that hold one block
@@ -314,7 +315,7 @@ class Property:
 class GasProperty(Property):
     def __init__(self) -> None:
         super().__init__()
-        self.set_spread(30)
+        self.set_spread(10)
         self.name = "gas"
 
     @override

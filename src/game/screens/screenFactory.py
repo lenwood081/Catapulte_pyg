@@ -1,6 +1,7 @@
 import pygame
 from screens.menus.mainMenu import MainMenu
 from screens.game.mainGame import MainGame
+from screens.game.serverGame import ServerGame
 from screens.screen import Screen
 
 # a singleton factory that stores all screens to promote reuse of screen

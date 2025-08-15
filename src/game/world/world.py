@@ -93,7 +93,7 @@ class World():
         for row in self.world:
             for block in row:
                 block.draw(self.surface)
-        
+
         # draw to camera
         camera.draw_surface(self.surface)
 

@@ -1,3 +1,5 @@
+import json
+
 """
 A singlton class that accepts the most recent game updates in a 
 set form
@@ -11,7 +13,7 @@ class UpdatePusher:
         self.update_buffer = []
 
         self.frame_number = 0
-        self.update_buffer[self.frame_number] = []
+        self.update_buffer.append([])
 
         self.active = False
 
@@ -21,15 +23,25 @@ class UpdatePusher:
             UpdatePusher.instance = UpdatePusher()
         return UpdatePusher.instance
 
-    def set_frame_number(self, frame_number):
-        if frame_number != self.frame_number:
-            self.update_buffer[frame_number] = []
-        self.frame_number = frame_number
+    def increase_frame_number(self):
+        self.update_buffer.append([])
+        self.frame_number += 1
 
     def add_update(self, update):
         if not self.active:
             return
         self.update_buffer[self.frame_number].append(update)
+
+    def get_update(self):
+        frame = self.update_buffer[self.frame_number]
+        self.update_buffer[self.frame_number] = []
+        # convert to json format
+
+        json_form = {
+            "n": self.frame_number,
+            "f": frame
+        }
+        return json.dumps(json_form) # json frame
 
     def activate(self):
         self.active = True

@@ -22,14 +22,14 @@ class TCPClient:
         # revieve frames
         message_buffer = ""
         while True:
-            time.sleep(0.01) # PERFORMANCE
+            time.sleep(0.0001) # PERFORMANCE
 
             if not self.active_connection:
                 break
 
             # use message buffer to piece together frames
             # save frame and clear buffer, SOF, EOF
-            frame = client.recv(1024)
+            frame = client.recv(2048)
             message_buffer += frame.decode()
             if not message_buffer:
                 continue
@@ -39,6 +39,7 @@ class TCPClient:
                 frame_end += len(EOF)
                 self.frame_buffer.append(message_buffer[:frame_end])
                 message_buffer = message_buffer[frame_end:]
+
 
         client.close()
 
@@ -64,6 +65,7 @@ class TCPClient:
 
 
 client1 = TCPClient()
+client1.start_connection_thread()
 
 while True:
     time.sleep(0.01) # PERFORMANCE

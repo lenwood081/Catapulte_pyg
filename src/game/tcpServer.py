@@ -11,7 +11,7 @@ class TCPServer:
         self.bind_port = 9997
 
         self.client_number = 0
-        self.target_client_number = 2
+        self.target_client_number = 1
 
         # client fram index array
         self.client_frame_index = [False for i in range(self.target_client_number)]
@@ -50,8 +50,10 @@ class TCPServer:
         print(f"Accepted connection from {address}")
         self.all_connected = True
 
+        while not self.clients_connected():
+            time.sleep(0.1)
+
         # clear frame buffer
-        # self.frames[client_number] = []
         while True:
             time.sleep(0.01) # PERFORMANCE
 
@@ -59,7 +61,6 @@ class TCPServer:
             if self.frames[client_number]:
                 # complile frame
                 frame = SOF + self.frames[client_number][0] + EOF
-                print(frame)
 
                 # send frame
                 client_socket.send(frame.encode())
@@ -87,7 +88,7 @@ class TCPServer:
                 continue
 
             self.frames[i].append(frame)
-            print(self.frames[i])
+            # print(self.frames[i]) # DEBUG
 
     def clients_connected(self):
         return (self.target_client_number == self.client_number)
@@ -101,14 +102,7 @@ class TCPServer:
 
         return -1
 
-server = TCPServer()
-server_thread = threading.Thread(target=server.start)
-
-server_thread.start()
-
-while not server.clients_connected():
-    time.sleep(1)
-
-server.add_frame("hello")
+    def end_connection(self):
+        self.all_connected = False
 
 
