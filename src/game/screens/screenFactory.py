@@ -17,8 +17,16 @@ class Screen_Factory:
         self.window = pygame.display.set_mode((width, height))
 
         # screen type: screen instance
-        self.screens: dict[str, Screen] = {}
+        self.screens: dict[type, Screen] = {}
 
+    def get_screen(self, screen_name: type) -> Screen:
+        if screen_name not in self.screens:
+            self.screens[screen_name] = screen_name(self.window)
+
+        return self.screens[screen_name]
+
+    """
+    depreciated 
     def main_menu_screen(self) -> Screen:
         if "MainMenu" not in self.screens:
             self.screens["mainMenu"] = MainMenu(self.window) 
@@ -36,6 +44,7 @@ class Screen_Factory:
             self.screens["ServerGame"] = ServerGame(self.window) 
 
         return self.screens["ServerGame"]
+    """
 
     @staticmethod
     def get_instance():

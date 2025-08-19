@@ -34,8 +34,9 @@ class MainGame(Screen):
         super().run(dt, events)
         # check for exiting keypresses
         if events[1][K_ESCAPE]:
+            from screens.menus.mainMenu import MainMenu
             from screens.screenFactory import Screen_Factory
-            return Screen_Factory.get_instance().main_menu_screen()
+            return Screen_Factory.get_instance().get_screen(MainMenu)
 
         self.update(dt)
         self.draw()

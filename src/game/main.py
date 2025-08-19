@@ -5,6 +5,7 @@ Contains the main game loop
 
 import pygame
 from screens.screen import Screen
+from screens.menus.mainMenu import MainMenu
 from screens.screenFactory import Screen_Factory
 import time
 import sys
@@ -16,7 +17,7 @@ class Main:
     def start_game(self):
         pygame.init()
 
-        screen: Screen | None = Screen_Factory.get_instance().main_menu_screen()
+        screen: Screen | None = Screen_Factory.get_instance().get_screen(MainMenu)
 
 # delta time
         clock = pygame.time.Clock()

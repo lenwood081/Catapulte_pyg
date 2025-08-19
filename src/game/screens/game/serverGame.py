@@ -55,9 +55,11 @@ class ServerGame(Screen):
 
         # check for exiting keypresses
         if events[1][K_ESCAPE]:
-            from screens.screenFactory import Screen_Factory
             self.server.end_connection()
-            return Screen_Factory.get_instance().main_menu_screen()
+
+            from screens.screenFactory import Screen_Factory
+            from screens.menus.mainMenu import MainMenu
+            return Screen_Factory.get_instance().get_screen(MainMenu)
 
         self.update(dt)
         # push updates to clients

@@ -1,3 +1,4 @@
+from typing import override
 import pygame
 from observers.observer import Subscriber, ObserverFactory
 
@@ -47,9 +48,15 @@ Screen change button
 on click will queue a screen change
 """
 class ScreenChangeButton(Button):
-    def __init__(self, screen) -> None:
+    def __init__(self, screen_parent, screen_target: type) -> None:
         super().__init__()
-        self.screen = screen
+        self.parent = screen_parent
+        self.target_type = screen_target
 
-    def 
+    @override
+    def on_click(self):
+        # super().on_click()
+        from screens.screenFactory import Screen_Factory
+        self.parent.set_queued_screen(Screen_Factory.get_instance().get_screen(self.target_type))
+
 

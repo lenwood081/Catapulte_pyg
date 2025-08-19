@@ -1,8 +1,9 @@
 # import screens
 from typing import override
+from screens.game.serverGame import ServerGame
 from screens.screen import Screen
 from pygame.locals import K_q, K_ESCAPE, K_RETURN
-from menu.button import Button
+from menu.button import ScreenChangeButton, Button
 
 class MainMenu(Screen):
     def __init__(self, window):
@@ -10,7 +11,7 @@ class MainMenu(Screen):
 
         self.buttons: list[Button] = []
 
-        self.buttons.append(Button())
+        self.buttons.append(ScreenChangeButton(self, ServerGame))
 
     @override
     def draw(self):
@@ -34,7 +35,7 @@ class MainMenu(Screen):
         #    return Screen_Factory.get_instance().main_game_screen()
         
         self.draw()
-        return self
+        return self.queued_screen
 
 
     
