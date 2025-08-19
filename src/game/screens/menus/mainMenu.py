@@ -1,5 +1,6 @@
-# import screens
+import pygame
 from typing import override
+from screens.game.mainGame import MainGame
 from screens.game.serverGame import ServerGame
 from screens.screen import Screen
 from pygame.locals import K_q, K_ESCAPE, K_RETURN
@@ -9,9 +10,17 @@ class MainMenu(Screen):
     def __init__(self, window):
         super().__init__(window)
 
-        self.buttons: list[Button] = []
+        self.buttons: dict[str, Button] = {}
 
-        self.buttons.append(ScreenChangeButton(self, ServerGame))
+        self.buttons["serverGame"] = ScreenChangeButton(self, ServerGame)
+        self.buttons["mainGame"] = ScreenChangeButton(self, MainGame)
+
+        self.buttons["serverGame"].set_dimensions(x=100, y=100)
+        self.buttons["mainGame"].set_dimensions(x=100, y=200)
+
+        button_surface = pygame.Surface((100, 50))
+        button_surface.fill((0, 0, 0))
+        self.buttons["mainGame"].set_image(button_surface)
 
     @override
     def draw(self):
@@ -19,7 +28,7 @@ class MainMenu(Screen):
         self.window.fill((0, 255, 0)) 
         
         # draw buttons
-        for button in self.buttons:
+        for button in self.buttons.values():
             button.draw(self.window)
 
     @override 

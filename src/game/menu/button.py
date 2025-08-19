@@ -8,17 +8,16 @@ takes a image
 does some action
 """
 class Button(Subscriber):
-    def __init__(self, width=50, height=100) -> None:
+    def __init__(self, width=100, height=50, x=100, y=100) -> None:
         super().__init__() # Subscriber
 
         # graphics 
         self.height = height
         self.width = width
-        self.x = 100
-        self.y = 100
+        self.x = x
+        self.y = y
         self.image = pygame.Surface((self.width, self.height))
         self.image.fill((255, 255, 255))
-
 
         # add to arrow key observer
         ObserverFactory.get_instance().get_mouse_left_click_pos().add_subscriber(self)
@@ -38,6 +37,12 @@ class Button(Subscriber):
     def on_click(self):
         # override
         print("button clicked") 
+
+    def set_dimensions(self, width=None, height=None, x=None, y=None):
+        self.width = width if width is not None else self.width
+        self.height = height if height is not None else self.height
+        self.x = x if x is not None else self.x
+        self.y = y if y is not None else self.y
 
     def draw(self, surface):
         surface.blit(self.image, (self.x, self.y))
