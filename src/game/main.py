@@ -16,7 +16,7 @@ class Main:
     def start_game(self):
         pygame.init()
 
-        screen: Screen | None = Screen_Factory.get_instance().server_game_screen()
+        screen: Screen | None = Screen_Factory.get_instance().main_menu_screen()
 
 # delta time
         clock = pygame.time.Clock()

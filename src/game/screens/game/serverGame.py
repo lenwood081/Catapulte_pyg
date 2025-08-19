@@ -6,7 +6,7 @@ from camera.cameras.devCamera import DevCamera
 from world.worldTypes.testWorld import TestWorld
 from pygame.locals import K_ESCAPE
 from observers.observer import ObserverFactory
-from tcpServer import TCPServer
+from server.tcpServer import TCPServer
 
 """
 Server Game, authorative as to the game state
@@ -45,6 +45,8 @@ class ServerGame(Screen):
 
     @override 
     def run(self, dt: float, events):
+        super().run(dt, events)
+        
         # only run if there is a connection
         if not self.server.clients_connected():
             return self
@@ -57,17 +59,14 @@ class ServerGame(Screen):
             self.server.end_connection()
             return Screen_Factory.get_instance().main_menu_screen()
 
-        # inform observers
-        ObserverFactory.get_instance().get_arrorK().notify(events[1])
-        ObserverFactory.get_instance().get_mouse_left_click_pos().notify((events[2], events[3]))
-        
         self.update(dt)
         # push updates to clients
         self.server.add_frame(UpdatePusher.get_instance().get_update())
 
         self.draw()
         print(dt) # DEBUG
-        return self
+
+        return self.queued_screen
 
 
  

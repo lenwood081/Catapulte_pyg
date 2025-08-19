@@ -7,24 +7,31 @@ takes a image
 does some action
 """
 class Button(Subscriber):
-    def __init__(self) -> None:
+    def __init__(self, width=50, height=100) -> None:
         super().__init__() # Subscriber
 
         # graphics 
-        self.height = 50
-        self.width = 100
-        self.x = 0
-        self.y = 0
+        self.height = height
+        self.width = width
+        self.x = 100
+        self.y = 100
         self.image = pygame.Surface((self.width, self.height))
+        self.image.fill((255, 255, 255))
 
 
         # add to arrow key observer
         ObserverFactory.get_instance().get_mouse_left_click_pos().add_subscriber(self)
-        self.assign_event_method(ObserverFactory.get_instance().get_mouse_left_click_pos(), )
+        self.assign_event_method(ObserverFactory.get_instance().get_mouse_left_click_pos(), self.mouse_click)
 
-    def mosuse
+    def mouse_click(self, information):
+        # information = (mouse_x, mouse_y)
+        # determine if clicked in button
+        
+        if information[0] > self.x and information[0] < self.x + self.width:
+            if information[1] > self.y and information[1] < self.y + self.height:
+                self.on_click()
 
-    def set_image(self, image)
+    def set_image(self, image):
         self.image = image
 
     def on_click(self):
@@ -34,3 +41,15 @@ class Button(Subscriber):
     def draw(self, surface):
         surface.blit(self.image, (self.x, self.y))
         
+
+"""
+Screen change button
+on click will queue a screen change
+"""
+class ScreenChangeButton(Button):
+    def __init__(self, screen) -> None:
+        super().__init__()
+        self.screen = screen
+
+    def 
+

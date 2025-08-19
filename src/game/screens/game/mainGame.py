@@ -31,18 +31,15 @@ class MainGame(Screen):
 
     @override 
     def run(self, dt: float, events):
+        super().run(dt, events)
         # check for exiting keypresses
         if events[1][K_ESCAPE]:
             from screens.screenFactory import Screen_Factory
             return Screen_Factory.get_instance().main_menu_screen()
 
-        # inform observers
-        ObserverFactory.get_instance().get_arrorK().notify(events[1])
-        ObserverFactory.get_instance().get_mouse_left_click_pos().notify((events[2], events[3]))
-        
         self.update(dt)
         self.draw()
-        return self
+        return self.queued_screen
 
 
  
