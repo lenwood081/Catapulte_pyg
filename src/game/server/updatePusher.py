@@ -49,4 +49,3 @@ class UpdatePusher:
     def deactivate(self):
         self.active = False
 
-

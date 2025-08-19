@@ -45,6 +45,7 @@ class ObserverFactory:
             self.observers["MouseLeftClickPosObserver"] = MouseLeftClickPosObserver()
         return self.observers["MouseLeftClickPosObserver"]
 
+
     @staticmethod
     def get_instance():
         if not ObserverFactory.instance:

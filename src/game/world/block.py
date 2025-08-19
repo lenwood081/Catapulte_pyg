@@ -30,6 +30,8 @@ class Block(Subscriber):
         # graphics of block
         self.base_color = (255, 0, 0)
         self.color = self.base_color
+        self.surface = pygame.surface.Surface((Block._size, Block._size))
+        self.surface.fill(self.color)
 
         # free flight properties
         self.velocity: tuple[float, float] = (0, 0)
@@ -77,9 +79,11 @@ class Block(Subscriber):
             self.base_color = (self.base_color[0], self.base_color[1], 255)
 
         self.color = self.base_color
+        self.set_color(self.color)
 
     def set_color(self, color):
         self.color = color
+        self.surface.fill(color)
 
     def set_holder(self, holder):
         self.holder = holder
@@ -184,9 +188,10 @@ class Block(Subscriber):
         # draw block
 
         # TODO: transform to blit on surface call (avoids expensive draw calls)
+        surface.blit(self.surface, (self.x, self.y))
 
-        pygame.draw.rect(surface, self.color, 
-                        (self.x, self.y, Block._size, Block._size)) 
+        #pygame.draw.rect(surface, self.color, 
+        #                (self.x, self.y, Block._size, Block._size)) 
 
 
 
