@@ -63,6 +63,9 @@ class TCPClient:
     def stop_connection(self):
         self.active_connection = False
 
+    def get_active_connection(self) -> bool:
+        return self.active_connection
+
 """
 client1 = TCPClient()
 client1.start_connection_thread()

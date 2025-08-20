@@ -46,7 +46,7 @@ class TCPServer:
             
             try:
                 client_socket, address = server_socket.accept()
-                with client_socket:
+                if client_socket:
 
                     client_handler = threading.Thread(target=self.handle_client, args=(client_socket, address, self.select_free_client_number()))
 

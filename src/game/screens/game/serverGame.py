@@ -83,7 +83,7 @@ class ServerGame(Screen):
         self.server.add_frame(UpdatePusher.get_instance().get_update())
 
         self.draw()
-        print(dt) # DEBUG
+        # print(dt) # DEBUG
 
         return self.queued_screen
 
