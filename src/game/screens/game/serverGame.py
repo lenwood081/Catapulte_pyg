@@ -5,7 +5,6 @@ from typing import override
 from camera.cameras.devCamera import DevCamera
 from world.worldTypes.testWorld import TestWorld
 from pygame.locals import K_ESCAPE
-from observers.observer import ObserverFactory
 from server.tcpServer import TCPServer
 
 """
@@ -22,10 +21,22 @@ class ServerGame(Screen):
         self.world = TestWorld((800, 600))
         self.camera = DevCamera(800, 600)
 
+        # start server thread here, not using method
+        # as the diagnostic does not pick it up
         self.server = TCPServer()
         self.server_thread = threading.Thread(target=self.server.start)
         self.server_thread.start()
         UpdatePusher.get_instance().activate()
+
+        self.server_active = True
+
+
+    def start_server_thread(self):
+        self.server = TCPServer()
+        self.server_thread = threading.Thread(target=self.server.start)
+        self.server_thread.start()
+        UpdatePusher.get_instance().activate()
+        self.server_active = True
     
     @override
     def update(self, dt: float) -> None:
@@ -46,20 +57,26 @@ class ServerGame(Screen):
     @override 
     def run(self, dt: float, events):
         super().run(dt, events)
+
+        # start server if not already started
+        if not self.server_active:
+            self.start_server_thread()
+
+        # check for exiting keypresses
+        if events[1][K_ESCAPE]:
+            self.server.end_server()
+            self.server_active = False
+            UpdatePusher.get_instance().deactivate()
+
+            from screens.screenFactory import Screen_Factory
+            from screens.menus.mainMenu import MainMenu
+            return Screen_Factory.get_instance().get_screen(MainMenu)
         
         # only run if there is a connection
         if not self.server.clients_connected():
             return self
 
         UpdatePusher.get_instance().increase_frame_number()
-
-        # check for exiting keypresses
-        if events[1][K_ESCAPE]:
-            self.server.end_connection()
-
-            from screens.screenFactory import Screen_Factory
-            from screens.menus.mainMenu import MainMenu
-            return Screen_Factory.get_instance().get_screen(MainMenu)
 
         self.update(dt)
         # push updates to clients

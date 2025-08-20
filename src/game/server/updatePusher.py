@@ -47,5 +47,9 @@ class UpdatePusher:
         self.active = True
 
     def deactivate(self):
+        self.update_buffer = []
+        self.frame_number = 0
+        self.update_buffer.append([])
+
         self.active = False
 

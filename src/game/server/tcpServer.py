@@ -20,35 +20,48 @@ class TCPServer:
         # frame array scafforlding
         self.frames = [[] for i in range(self.target_client_number)]
 
-        self.all_connected = False
+        self.maintain_connection = False
+        self.maintain_listening = False
 
     def start(self):
+        self.maintain_listening = True
 
         # create TCP socket
-        server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
         # bind socket to port
-        server.bind((self.bind_ip, self.bind_port))
+        server_socket.bind((self.bind_ip, self.bind_port))
 
         # listen for connections
-        server.listen(self.target_client_number)
+        server_socket.listen(self.target_client_number)
+        server_socket.settimeout(1)
 
         print(f"[*] Listening on {self.bind_ip}:{self.bind_port}")
 
         # accept connection
         while True:
-            client_socket, address = server.accept()
+            if not self.maintain_listening:
+                break
+            
+            try:
+                client_socket, address = server_socket.accept()
+                with client_socket:
 
-            # do something
-            client_handler = threading.Thread(target=self.handle_client, args=(client_socket, address, self.select_free_client_number()))
+                    client_handler = threading.Thread(target=self.handle_client, args=(client_socket, address, self.select_free_client_number()))
 
-            self.client_number += 1
-            client_handler.start()
+                    self.client_number += 1
+                    client_handler.start()
+            except socket.timeout:
+                continue
+
+        print("[*] Listening stopped")
+        server_socket.close()
+
 
     def handle_client(self, client_socket, address, client_number):
         print(f"Accepted connection from {address}")
-        self.all_connected = True
+        self.maintain_connection = True
 
         while not self.clients_connected():
             time.sleep(0.1)
@@ -66,12 +79,12 @@ class TCPServer:
                 client_socket.send(frame.encode())
                 self.frames[client_number].pop(0)
             
-            if not self.all_connected:
+            if not self.maintain_connection:
                 # send opposing player disconnected message
                 break
 
         # some kind of indicator that disconnects all clients 
-        self.all_connected = False
+        self.maintain_connection = False
 
         print(f"Closing connection from {address}")
         client_socket.close()
@@ -79,7 +92,7 @@ class TCPServer:
 
     def add_frame(self, frame):
         # if there are too many frames in one clients frame buffer
-        # potentually wait/ lag server until they send through
+        # potentually wait/ lag server_socket until they send through
         # or "combine" frame information for less frequent frame sending
 
         for i in range(self.target_client_number):
@@ -103,6 +116,11 @@ class TCPServer:
         return -1
 
     def end_connection(self):
-        self.all_connected = False
+        self.maintain_connection = False
+
+    def end_server(self):
+        self.end_connection()
+        time.sleep(0.1)
+        self.maintain_listening = False
 
 
