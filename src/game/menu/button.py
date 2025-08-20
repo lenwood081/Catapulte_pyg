@@ -33,6 +33,15 @@ class Button(Subscriber):
 
     def set_image(self, image):
         self.image = image
+        self.width = image.get_width()
+        self.height = image.get_height()
+
+    def scale_image(self, factor: float):
+        # TODO: scale image without losing quality
+
+        self.image = pygame.transform.scale_by(self.image, factor)
+        self.width = self.image.get_width()
+        self.height = self.image.get_height()
 
     def on_click(self):
         # override

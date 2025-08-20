@@ -63,7 +63,7 @@ class TCPClient:
     def stop_connection(self):
         self.active_connection = False
 
-
+"""
 client1 = TCPClient()
 client1.start_connection_thread()
 
@@ -73,3 +73,4 @@ while True:
     frame = client1.get_new_frame()
     if frame:
         print(frame)
+"""

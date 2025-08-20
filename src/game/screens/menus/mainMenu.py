@@ -1,7 +1,9 @@
 import pygame
+from libManager import LibManager
 from typing import override
 from screens.game.mainGame import MainGame
 from screens.game.serverGame import ServerGame
+from screens.game.clientGame import ClientGame
 from screens.screen import Screen
 from pygame.locals import K_q, K_ESCAPE, K_RETURN
 from menu.button import ScreenChangeButton, Button
@@ -14,13 +16,24 @@ class MainMenu(Screen):
 
         self.buttons["serverGame"] = ScreenChangeButton(self, ServerGame)
         self.buttons["mainGame"] = ScreenChangeButton(self, MainGame)
+        self.buttons["clientGame"] = ScreenChangeButton(self, ClientGame)
 
         self.buttons["serverGame"].set_dimensions(x=100, y=100)
-        self.buttons["mainGame"].set_dimensions(x=100, y=200)
+        self.buttons["mainGame"].set_dimensions(x=100, y=400)
+        self.buttons["clientGame"].set_dimensions(x=100, y=200)
 
-        button_surface = pygame.Surface((100, 50))
-        button_surface.fill((0, 0, 0))
+        button_surface = LibManager.get_instance().get_button_surface("Local.png")
         self.buttons["mainGame"].set_image(button_surface)
+        self.buttons["mainGame"].scale_image(3)
+
+        button_surface = LibManager.get_instance().get_button_surface("Host.png")
+        self.buttons["serverGame"].set_image(button_surface)
+        self.buttons["serverGame"].scale_image(3)
+
+        button_surface = LibManager.get_instance().get_button_surface("Join.png")
+        self.buttons["clientGame"].set_image(button_surface)
+        self.buttons["clientGame"].scale_image(3)
+
 
     @override
     def draw(self):
