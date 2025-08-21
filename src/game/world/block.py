@@ -12,11 +12,16 @@ class Block(Subscriber):
     _size = 8
     _block_count = 0
 
-    def __init__(self, pos: tuple[float, float]) -> None:
+    def __init__(self, pos: tuple[float, float], id: int = -1) -> None:
         super().__init__()
 
         self.__class__._block_count += 1
-        self.id = self.__class__._block_count
+
+        # id is -1 if it is a new block, else it is given a id if it is merely a reflection of a server block
+        if id == -1:
+            self.id = self.__class__._block_count
+        else:
+            self.id = id
 
         # block position
         self.x = pos[0]
@@ -212,7 +217,9 @@ class Block(Subscriber):
         self.move(dt)
 
         if self.update_state:
-            UpdatePusher.get_instance().add_update(self.summerise_block_state())
+            # if sending updates compile state
+            if UpdatePusher.get_instance().active:
+                UpdatePusher.get_instance().add_update(self.summerise_block_state())
             self.scheduled_to_update = True
 
     def summerise_block_state(self):

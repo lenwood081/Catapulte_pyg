@@ -7,7 +7,7 @@ It is also used to send game updates to all connected clients
 """
 
 class UpdatePusher:
-    instance = None
+    _instance = None
 
     def __init__(self):
         self.update_buffer = []
@@ -19,9 +19,9 @@ class UpdatePusher:
 
     @staticmethod
     def get_instance():
-        if UpdatePusher.instance is None:
-            UpdatePusher.instance = UpdatePusher()
-        return UpdatePusher.instance
+        if UpdatePusher._instance is None:
+            UpdatePusher._instance = UpdatePusher()
+        return UpdatePusher._instance
 
     def increase_frame_number(self):
         self.update_buffer.append([])
