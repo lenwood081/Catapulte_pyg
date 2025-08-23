@@ -1,9 +1,12 @@
 from client.tcpClient import TCPClient
+from client.UpdateReceiver import UpdateReceiver
+from camera.cameras.devCamera import DevCamera
+from world.world import World
+from world.worldTypes.reflectionWorld import ReflectionWorld
 from screens.screen import Screen
 from typing import override
 from camera.cameras.devCamera import DevCamera
 from pygame.locals import K_ESCAPE
-from observers.observer import ObserverFactory
 
 """
 Client Game
@@ -16,9 +19,9 @@ class ClientGame(Screen):
     def __init__(self, window):
         super().__init__(window)
 
-        # special client world
-        self.world = None
-        self.camera = DevCamera(800, 600)
+        # world and camera placeholders
+        self.world: World 
+        self.camera: DevCamera 
 
         self.client = TCPClient()
         self.client.start_connection_thread()
@@ -57,12 +60,21 @@ class ClientGame(Screen):
 
         # get frame data from tcp client
         frame = self.client.get_new_frame()
-        if frame:
-            print(frame)
-            # parse frame data to world
+        while frame:
+            print(frame) # DEBUG
+
+            # parse frame data to UpdateReceiver
+            UpdateReceiver.get_instance().upload_frame(frame)
+
+            if UpdateReceiver.get_instance().get_frame_number() == 0:
+                self.world, self.camera = UpdateReceiver.get_instance().unpack_start_data(ReflectionWorld, DevCamera)
+
+            frame = self.client.get_new_frame()
+        
+        if UpdateReceiver.get_instance().get_frame_number() == 0:
+            return self 
         
         self.update(dt)
-
         self.draw()
         return self
 

@@ -53,6 +53,8 @@ class TCPClient:
 
         frame = self.frame_buffer[0] 
         self.frame_buffer.pop(0)
+
+        frame = frame[len(SOF):len(frame)-len(EOF)]
         return frame
 
     def start_connection_thread(self):

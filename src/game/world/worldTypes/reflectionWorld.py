@@ -16,9 +16,14 @@ class ReflectionWorld(World):
         # unique ID determined by block ID
         self.blocks = []
 
+    def assign_block(self, block):
+        # use position of block to assing it to a approprite block holder
+        x, y = block.get_index()
+        self.world[x][y].set_block(block)
+
     @override 
     def update(self, dt: float):
-
         # update blocks in world based on update pusher
-
         pass
+
+

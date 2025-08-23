@@ -47,6 +47,7 @@ class ServerGame(Screen):
         
         UpdatePusher.get_instance().add_update(state)
 
+
     def start_server_thread(self):
         self.server = TCPServer()
         self.server_thread = threading.Thread(target=self.server.start)
