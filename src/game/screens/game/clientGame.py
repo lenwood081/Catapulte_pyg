@@ -39,8 +39,10 @@ class ClientGame(Screen):
         self.window.fill((255, 255, 0)) 
         
         # draw world
-        # self.world.draw(self.camera)
-        self.camera.draw(self.window)
+        if self.world:
+            self.world.draw(self.camera)
+        if self.camera:
+            self.camera.draw(self.window)
 
     @override 
     def run(self, dt: float, events):
@@ -61,7 +63,7 @@ class ClientGame(Screen):
         # get frame data from tcp client
         frame = self.client.get_new_frame()
         while frame:
-            print(frame) # DEBUG
+            # print(frame) # DEBUG
 
             # parse frame data to UpdateReceiver
             UpdateReceiver.get_instance().upload_frame(frame)

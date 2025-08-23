@@ -45,21 +45,24 @@ class UpdateReceiver:
         Block._size = self.block_size
 
         new_world = world(self.world_size)
-        new_camera = camera(self.camera_size[0], self.camera_size[1])
+        new_camera = camera(self.camera_size)
+
+        # create blocks from json
+        for block_data in self.frame["f"][0]["blocks"]:
+            new_block = self.create_block(block_data)
+            new_world.assign_block(new_block)
 
         return (new_world, new_camera)
 
     def create_block(self, block_data):
-        new_block = Block(
-            tuple(block_data["p"]), 
-            block_data["id"]
-        ) 
+        new_block = Block(tuple(block_data["p"]), block_data["id"]) 
 
         # add other attributes
-        new_block.velocity = block_data["v"]
-        new_block.speed = block_data["s"]
-        new_block.color = block_data["c"]
-        new_block.base_color = block_data["bc"]
+        new_block.velocity = tuple(block_data["v"])
+        new_block.speed = tuple(block_data["s"])
+        new_block.set_color(tuple(block_data["c"]))
+        new_block.base_color = tuple(block_data["bc"])
+        print(new_block.color, new_block.base_color)
 
         # add properties
         # TODO add properties

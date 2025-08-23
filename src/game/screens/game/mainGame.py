@@ -11,7 +11,7 @@ class MainGame(Screen):
         super().__init__(window)
 
         self.world = TestWorld((800, 600))
-        self.camera = DevCamera(800, 600)
+        self.camera = DevCamera((800, 600))
 
     @override
     def update(self, dt: float) -> None:

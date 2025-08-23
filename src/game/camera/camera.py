@@ -7,11 +7,10 @@ blit reletive too
 import pygame
 
 class Camera:
-    def __init__(self, width, height):
-        self.surface = pygame.surface.Surface((width, height))
+    def __init__(self, dimensions: tuple[float, float]):
+        self.surface = pygame.surface.Surface(dimensions)
         self.surface.fill((255, 255, 255))
-        self.width = width
-        self.height = height
+        self.width, self.height = dimensions
 
         # relative position to the world
         self.x = 0

@@ -33,7 +33,7 @@ class Block(Subscriber):
         self.properties: list[Property] = []
 
         # graphics of block
-        self.base_color = (255, 0, 0)
+        self.base_color = (255, 255, 255)
         self.color = self.base_color
         self.surface = pygame.surface.Surface((Block._size, Block._size))
         self.surface.fill(self.color)
@@ -206,7 +206,8 @@ class Block(Subscriber):
             self.color = self.base_color
             return
 
-        self.color = (100, 0, 0) # DEBUGGING
+        # self.color = (100, 0, 0) # DEBUGGING
+        print(self.__class__.__name__, self.base_color, self.color)
         self.scheduled_to_update = False
 
         # update all properties
@@ -223,8 +224,6 @@ class Block(Subscriber):
             self.scheduled_to_update = True
 
     def summerise_block_state(self):
-        # TODO: Complile to json form for sending over network 
-
         state = {
             "p": (self.x, self.y),
             "v": self.velocity,

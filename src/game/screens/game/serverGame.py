@@ -19,7 +19,7 @@ class ServerGame(Screen):
         super().__init__(window)
 
         self.world = TestWorld((800, 600))
-        self.camera = DevCamera(800, 600)
+        self.camera = DevCamera((800, 600))
 
         # start server thread here, not using method
         # as the diagnostic does not pick it up
@@ -40,8 +40,8 @@ class ServerGame(Screen):
 
         state = {
             "block_size": Block._size,
-            "world_size": (self.world.x, self.world.y),
-            "camera_size": (self.camera.x, self.camera.y),
+            "world_size": (self.world.x_p, self.world.y_p),
+            "camera_size": (self.camera.width, self.camera.height),
             "blocks": blocks,
         }
         

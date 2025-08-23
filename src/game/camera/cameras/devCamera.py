@@ -6,8 +6,8 @@ from camera.camera import Camera
 from observers.observer import Subscriber, ObserverFactory
 
 class DevCamera(Camera, Subscriber):
-    def __init__(self, width, height):
-        super().__init__(width, height)
+    def __init__(self, dimensions: tuple[float, float]):
+        super().__init__(dimensions)
         super(Camera, self).__init__()
         
         # add to arrow key observer

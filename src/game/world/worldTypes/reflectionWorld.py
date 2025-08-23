@@ -19,6 +19,7 @@ class ReflectionWorld(World):
     def assign_block(self, block):
         # use position of block to assing it to a approprite block holder
         x, y = block.get_index()
+        print(x, y)
         self.world[x][y].set_block(block)
 
     @override 
