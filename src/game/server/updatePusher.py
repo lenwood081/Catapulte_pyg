@@ -27,6 +27,9 @@ class UpdatePusher:
         self.update_buffer.append([])
         self.frame_number += 1
 
+    def get_frame_number(self):
+        return self.frame_number
+
     def add_update(self, update):
         if not self.active:
             return
@@ -41,6 +44,7 @@ class UpdatePusher:
             "n": self.frame_number,
             "f": frame
         }
+
         return json.dumps(json_form) # json frame
 
     def activate(self):

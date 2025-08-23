@@ -6,7 +6,6 @@ from tcpMessageSymbols import *
 
 class TCPClient:
     def __init__(self):
-
         self.frame_buffer = []
 
         self.active_connection = False

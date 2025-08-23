@@ -25,6 +25,18 @@ class World():
 
         self.surface = pygame.surface.Surface((self.x_p, self.y_p))
 
+    def compile_start_data(self):
+
+        # compile blocks
+        blocks = []
+        for i in range(self.x):
+            for j in range(self.y):
+                if self.world[i][j].block is None:
+                    continue
+                blocks.append(self.world[i][j].block.summerise_block_state())
+        
+        return blocks
+
     def set_neibours(self):
         """
         Assign neibours to all blocks in world

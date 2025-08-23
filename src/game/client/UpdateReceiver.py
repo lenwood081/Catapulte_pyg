@@ -14,3 +14,8 @@ class UpdateReceiver:
         self.update_buffer = []
 
         self.frame_number = 0
+
+        self.
+
+
+

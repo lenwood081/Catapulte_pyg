@@ -30,6 +30,22 @@ class ServerGame(Screen):
 
         self.server_active = True
 
+    def complile_start_data(self):
+        # get state of starting blocks, world size, etc
+
+        # blocks
+        blocks = self.world.compile_start_data()
+
+        from world.block import Block
+
+        state = {
+            "block_size": Block._size,
+            "world_size": (self.world.x, self.world.y),
+            "camera_size": (self.camera.x, self.camera.y),
+            "blocks": blocks,
+        }
+        
+        UpdatePusher.get_instance().add_update(state)
 
     def start_server_thread(self):
         self.server = TCPServer()
@@ -76,15 +92,16 @@ class ServerGame(Screen):
         if not self.server.clients_connected():
             return self
 
-        UpdatePusher.get_instance().increase_frame_number()
+        # if first frame, send starting data
+        if UpdatePusher.get_instance().get_frame_number() == 0:
+            self.complile_start_data()
+        else:
+            self.update(dt)
+            self.draw()
 
-        self.update(dt)
         # push updates to clients
         self.server.add_frame(UpdatePusher.get_instance().get_update())
-
-        self.draw()
-        # print(dt) # DEBUG
-
+        UpdatePusher.get_instance().increase_frame_number()
         return self.queued_screen
 
 

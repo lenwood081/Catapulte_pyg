@@ -1,4 +1,4 @@
-from tcpClient import TCPClient
+from client.tcpClient import TCPClient
 from screens.screen import Screen
 from typing import override
 from camera.cameras.devCamera import DevCamera
